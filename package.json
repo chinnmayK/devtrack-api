@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "start": "pm2 start index.js --name devtrack-api --no-daemon"
-},
+    "start": "pm2 start index.js --name devtrack-api --no-daemon"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chinnmayk/devtrack-api.git"
