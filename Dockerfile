@@ -1,20 +1,24 @@
-# 1️⃣ Base Image (Lightweight Linux + Node)
 FROM node:18-alpine
 
-# 2️⃣ Set working directory inside container
+# Install nginx & pm2
+RUN apk add --no-cache nginx \
+ && npm install -g pm2
+
+# Create app directory
 WORKDIR /app
 
-# 3️⃣ Copy dependency files first (layer caching)
+# Copy package files
 COPY package*.json ./
-
-# 4️⃣ Install dependencies
 RUN npm install --production
 
-# 5️⃣ Copy application code
+# Copy app source
 COPY . .
 
-# 6️⃣ Expose application port
-EXPOSE 3000
+# Copy nginx config
+COPY nginx/default.conf /etc/nginx/http.d/default.conf
 
-# 7️⃣ Start the application
-CMD ["npm", "start"]
+# Expose HTTP only
+EXPOSE 80
+
+# Start nginx + node (via pm2)
+CMD sh -c "pm2 start ecosystem.config.js && nginx -g 'daemon off;'"
