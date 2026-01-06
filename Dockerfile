@@ -17,8 +17,8 @@ COPY app ./app
 # Copy nginx config
 COPY nginx/default.conf /etc/nginx/http.d/default.conf
 
-# Expose HTTP only
+# Expose HTTP only (ALB -> Nginx)
 EXPOSE 80
 
-# Start PM2 + Nginx
-CMD sh -c "cd app && pm2 start ecosystem.config.js && nginx -g 'daemon off;'"
+# Start nginx + pm2 (CORRECT way for ECS)
+CMD sh -c "nginx && pm2-runtime app/ecosystem.config.js"

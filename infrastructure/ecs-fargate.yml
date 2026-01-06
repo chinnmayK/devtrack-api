@@ -39,30 +39,37 @@ Resources:
       ContainerDefinitions:
         - Name: devtrack-container
           Image: !Ref ECRImageURI
-          PortMappings:
-            - ContainerPort: 3000
           Essential: true
+          PortMappings:
+            - ContainerPort: 80
 
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow HTTP traffic
+      GroupDescription: Allow HTTP from ALB
       VpcId: vpc-0f81db8d920f2368b
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 3000
-          ToPort: 3000
+          FromPort: 80
+          ToPort: 80
           CidrIp: 0.0.0.0/0
 
   ECSService:
     Type: AWS::ECS::Service
-    DependsOn: ECSCluster
+    DependsOn:
+      - ECSCluster
     Properties:
       ServiceName: devtrack-service
       Cluster: !Ref ECSCluster
       LaunchType: FARGATE
       DesiredCount: 1
       TaskDefinition: !Ref TaskDefinition
+
+      LoadBalancers:
+        - ContainerName: devtrack-container
+          ContainerPort: 80
+          TargetGroupArn: arn:aws:elasticloadbalancing:us-east-1:202533520289:targetgroup/devtrack-tg/c5e0d5b5508bc48e
+
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
